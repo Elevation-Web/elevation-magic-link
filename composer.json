@@ -1,0 +1,36 @@
+{
+  "name": "elevation/elevation-magic-link",
+  "type": "wordpress-plugin",
+  "description": "Hi. I'm a plugin called Elevation Magic Link Login.",
+  "keywords": [
+    "WordPress",
+    "Plugins"
+  ],
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "Elevation",
+      "homepage": "https://www.elevationweb.org"
+    }
+  ],
+  "require": {
+    "php": "^7.4 || ^8.0",
+    "rosell-dk/webp-convert": "^2.9"
+  },
+  "require-dev": {
+    "php-parallel-lint/php-parallel-lint": "^1.2.0",
+    "wp-cli/i18n-command": "^2.2.5",
+    "wp-coding-standards/wpcs": "^3.0"
+  },
+  "scripts": {
+    "lint:wpcs": "@php ./vendor/bin/phpcs -ps . --extensions=php --standard=WordPress --ignore=*/vendor/*,*/node_modules/*,*/src/*,*/build/**/*.asset.php",
+    "lint:php": "@php ./vendor/bin/parallel-lint --exclude .git --exclude vendor --exclude node_modules .",
+    "make-pot": "wp i18n make-pot . languages/elevation.pot",
+    "format": "@php ./vendor/bin/phpcbf --standard=WordPress . --extensions=php --ignore=*/vendor/*,*/node_modules/*,*/assets/*"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
+}
