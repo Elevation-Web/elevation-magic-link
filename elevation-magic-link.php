@@ -28,27 +28,27 @@ function emll_add_magic_link_button() {
 	// Add a security nonce field for the request form.
 	wp_nonce_field( 'emll_request_magic_nonce', 'emll_nonce' );
 	?>
-	<div class="emll-container" style="margin: 20px 0; padding-top: 10px; border-top: 1px solid #ddd; text-align: center;">
+	<div class="emll-container">
 
 		<!-- View 1: Initial Toggle Button -->
 		<div id="emll-view-toggle">
-			<p style="font-size: 12px; color: #666; margin-bottom: 10px;">
+			<p class="emll-text">
 				<?php echo esc_html__( "Don't want to use a password?", 'elevation-magic-link' ); ?>
 			</p>
-			<button type="button" id="emll-toggle-btn" class="button button-secondary" style="width: 100%; height: 40px;">
+			<button type="button" id="emll-toggle-btn" class="button button-secondary emll-full-width-btn">
 				<?php echo esc_html__( 'Send Me a Magic Link', 'elevation-magic-link' ); ?>
 			</button>
 		</div>
 
-		<!-- View 2: Magic Link Submission (Hidden by default) -->
-		<div id="emll-view-submit" style="display:none;">
-			<p style="font-size: 12px; color: #666; margin-bottom: 10px;">
+		<!-- View 2: Magic Link Submission (Hidden by default via CSS) -->
+		<div id="emll-view-submit">
+			<p class="emll-text">
 				<?php echo esc_html__( 'Enter your username or email above.', 'elevation-magic-link' ); ?>
 			</p>
-			<button type="button" id="emll-submit-btn" class="button button-primary" style="width: 100%; height: 40px; margin-bottom: 10px;">
+			<button type="button" id="emll-submit-btn" class="button button-primary emll-full-width-btn">
 				<?php echo esc_html__( 'Send Login Link', 'elevation-magic-link' ); ?>
 			</button>
-			<a href="#" id="emll-back-btn" style="font-size: 12px; text-decoration: none;">
+			<a href="#" id="emll-back-btn">
 				<?php echo esc_html__( 'Back to Password Login', 'elevation-magic-link' ); ?>
 			</a>
 		</div>
@@ -60,16 +60,51 @@ function emll_add_magic_link_button() {
 }
 
 /**
- * Enqueue scripts correctly using wp_add_inline_script.
+ * Enqueue scripts and styles correctly using wp_add_inline_script and wp_add_inline_style.
  */
 add_action( 'login_enqueue_scripts', 'emll_login_scripts' );
 
 /**
- * Register and enqueue the JS for the login button interaction.
+ * Register and enqueue the JS and CSS for the login button interaction.
  */
 function emll_login_scripts() {
+	// 1. Handle Styles
+	wp_register_style( 'emll-login-style', false, array(), '1.2.2' );
+	wp_enqueue_style( 'emll-login-style' );
+
+	$css = '
+        .emll-container {
+            margin: 20px 0;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+        }
+        .emll-text {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .emll-full-width-btn {
+            width: 100%;
+            height: 40px !important; /* Force height to match WP login buttons */
+            margin-bottom: 10px;
+        }
+        #emll-view-submit {
+            display: none;
+        }
+        #emll-back-btn {
+            font-size: 12px;
+            text-decoration: none;
+        }
+        /* Style for the login message */
+        .login .message.emll-message {
+            border-left-color: #662d91;
+        }
+    ';
+	wp_add_inline_style( 'emll-login-style', $css );
+
+	// 2. Handle Scripts
 	// Register a dummy handle to attach the inline script to.
-	// We depend on 'login' or 'jquery' if available, but 'login' is safe on this page.
 	wp_register_script( 'emll-login-script', '', array(), '1.2.2', true );
 	wp_enqueue_script( 'emll-login-script' );
 
@@ -331,7 +366,8 @@ function emll_custom_login_message( $message ) {
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	if ( isset( $_GET['magic_sent'] ) && '1' === $_GET['magic_sent'] ) {
 		$notice = esc_html__( 'Check your email! If an account exists, we\'ve sent you a magic login link.', 'elevation-magic-link' );
-		return $message . '<p class="message" style="border-left-color: #662d91;">' . $notice . '</p>';
+		// Removed inline style, added class emll-message.
+		return $message . '<p class="message emll-message">' . $notice . '</p>';
 	}
 	return $message;
 }
